@@ -4,7 +4,7 @@ Area: extensionapi
 TOCTitle: Contribution Points
 ContentId: 2F27A240-8E36-4CC2-973C-9A1D8069F83F
 PageTitle: Visual Studio Code Extension Contribution Points - package.json
-DateApproved: 2/2/2017
+DateApproved: 3/1/2017
 MetaDescription: To extend Visual Studio Code, your extension (plug-in) declares which of the various contribution points it is using in its package.json extension manifest file.
 ---
 
@@ -57,6 +57,25 @@ You can read these values from your extension using `vscode.workspace.getConfigu
 
 ![configuration extension point example](images/extension-points/configuration.png)
 
+## contributes.configurationDefaults
+
+Contribute default language specific editor configurations. This will override default editor configurations for the provided language.
+Following example contributes default editor configurations for `markdown` language.
+
+### Example
+
+```json
+contributes": {
+    "configurationDefaults": {
+        "[markdown]": {
+            "editor.wordWrap": "on",
+            "editor.quickSuggestions": false
+        }
+    }
+}
+```
+
+
 ## contributes.commands
 
 Contribute an entry consisting of a title and a command to invoke to the Command Palette (`kb(workbench.action.showCommands)`).
@@ -82,15 +101,16 @@ Contribute a menu item for a command to the editor or Explorer. The menu item de
 
 Currently extension writers can to contribute to:
 
+* The global Command Palette - `commandPalette`
 * The Explorer context menu - `explorer/context`
 * The editor context menu - `editor/context`
 * The editor title menu - `editor/title`
 * The editor title context menu - `editor/title/context`
-* The debug callstack view context menu - 'debug/callstack/context'
+* The debug callstack view context menu - `debug/callstack/context`
 
 >**Note:** When a command is invoked from a (context) menu, VS Code tries to infer the currently selected resource and passes that as a parameter when invoking the command. For instance, a menu item inside the Explorer is passed the URI of the selected resource and a menu item inside an editor is passed the URI of the document.
 
-In addition to a title, commands can also define icons which VS Code will show in the editor menu bar.
+The `commandPalette` menu is special because it contains all commands by default. To make your commands only show in there use the `when`-clause. In addition to a title, commands can also define icons which VS Code will show in the editor menu bar.
 
 ### Example
 

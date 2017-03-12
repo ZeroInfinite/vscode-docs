@@ -4,7 +4,7 @@ Area: editor
 TOCTitle: Tabs
 ContentId: DDBD486B-E18F-4C3E-9CA0-766DE5E5EE67
 PageTitle: Tabbed editor support in Visual Studio Code
-DateApproved: 2/2/2017
+DateApproved: 3/1/2017
 MetaDescription: Visual Studio Code has support for Tabbed editor windows. Tabs let you quickly navigate between your open files.  
 ---
 
@@ -87,7 +87,7 @@ Here are some handy keyboard shortcuts to quickly navigate between editors and e
 * `kb(workbench.action.focusFirstEditorGroup)` go to the leftmost editor group.
 * `kb(workbench.action.focusSecondEditorGroup)` go to the center editor group.
 * `kb(workbench.action.focusThirdEditorGroup)` go to the rightmost editor group.
-* `kb(workbench.action.focusPreviousGroup)` go the previous editor group.
+* `kb(workbench.action.focusPreviousGroup)` go to the previous editor group.
 * `kb(workbench.action.focusNextGroup)` go to the next editor group.
 * `kb(workbench.action.closeActiveEditor)` close the active editor.
 * `kb(workbench.action.closeEditorsInGroup)` close all editors in the editor group.

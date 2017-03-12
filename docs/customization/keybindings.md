@@ -4,7 +4,7 @@ Area: customization
 TOCTitle: Key Bindings
 ContentId: 045980C1-62C7-4E8E-8CE4-BAD722FFE31E
 PageTitle: Visual Studio Code Key Bindings
-DateApproved: 2/2/2017
+DateApproved: 3/1/2017
 MetaDescription: Here you will find the complete list of key bindings for Visual Studio Code and how to change them.
 MetaSocialImage: keybinding_customization_keybindings.png
 ---
@@ -213,7 +213,8 @@ Key|Command|Command id
 Key|Command|Command id
 ---|-------|----------
 `kb(editor.debug.action.toggleBreakpoint)`|Toggle Breakpoint|`editor.debug.action.toggleBreakpoint`
-`kb(workbench.action.debug.continue)`|Start, Continue|`workbench.action.debug.continue`
+`kb(workbench.action.debug.start)`|Start|`workbench.action.debug.start`
+`kb(workbench.action.debug.continue)`|Continue|`workbench.action.debug.continue`
 `kb(workbench.action.debug.run)`|Start (without debugging)|`workbench.action.debug.run`
 `kb(workbench.action.debug.pause)`|Pause|`workbench.action.debug.pause`
 `kb(workbench.action.debug.stepInto)`|Step Into|`workbench.action.debug.stepInto`

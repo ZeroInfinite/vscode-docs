@@ -4,7 +4,7 @@ Area: languages
 TOCTitle: CSS, Sass and Less
 ContentId: 039882CB-B5C4-46BD-A8D5-DB24A5E82706
 PageTitle: CSS, Sass and Less support in VS Code
-DateApproved: 2/2/2017
+DateApproved: 3/1/2017
 MetaDescription: Find out how Visual Studio Code can support your CSS, Sass and Less development.
 ---
 
@@ -49,6 +49,11 @@ We also support [User Defined Snippets](/docs/customization/userdefinedsnippets.
 As you type, we provide syntax highlighting as well as in context preview of colors.
 
 ![Syntax and color](images/css/color.png)
+
+>**Note:** You can hide VS Code's color previews by setting the corresponding `.colorDecorators.enable` [settings](/docs/customization/userandworkspace.md).
+>```json
+>    "css.colorDecorators.enable": false
+>```
 
 ## Syntax Verification & Linting
 

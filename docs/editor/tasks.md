@@ -4,7 +4,7 @@ Area: editor
 TOCTitle: Tasks
 ContentId: F5EA1A52-1EF2-4127-ABA6-6CEF5447C608
 PageTitle: Tasks in Visual Studio Code
-DateApproved: 2/2/2017
+DateApproved: 3/1/2017
 MetaDescription: Expand your development workflow with task integration in Visual Studio Code (Gulp, Grunt, Jake and more).
 ---
 
@@ -135,6 +135,20 @@ If you want to run multiple different commands you can specify different command
 
 The first task start the TypeScript compiler in watch mode, the second one starts the gulp build. If a tasks specifies a local command to run the task name is not included into the command line (`suppressTaskName` is `true` by default for these tasks). Since a local command can specify local arguments, there is no need for adding it by default. If a `tasks.json` file specifies both global and task local commands, the task local commands win over the global command. There is no merging between a global and a task local command.
 
+## Binding keyboard shortcuts to tasks
+
+If you need to run a task frequently, you can also define a keyboard shortcut for the task. 
+
+For example to bind `ctrl+h` to the `build` task from above, add the following to your `keyindings.json` file:
+
+```json
+{
+    "key": "ctrl+h",
+    "command": "workbench.action.tasks.runTask",
+    "args": "build"
+}
+```
+
 ## Variable substitution
 
 When authoring tasks configurations, it is often useful to have a set of predefined common variables.  VS Code supports variable substitution inside strings in the `tasks.json`  file and has the following predefined variables:
@@ -148,6 +162,7 @@ When authoring tasks configurations, it is often useful to have a set of predefi
 - **${fileDirname}** the current opened file's dirname
 - **${fileExtname}** the current opened file's extension
 - **${cwd}** the task runner's current working directory on startup
+- **${lineNumber}** the current selected line number in the active file
 
 You can also reference environment variables through **${env.Name}** (e.g. ${env.PATH}). Be sure to match the environment variable name's casing, for example `env.Path` on Windows.
 

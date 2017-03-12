@@ -4,7 +4,7 @@ Area: editor
 TOCTitle: IntelliSense
 ContentId: 80f4fa1e-d4c5-42cf-8b12-4b8e88c41c3e
 PageTitle: IntelliSense in Visual Studio Code
-DateApproved: 2/2/2017
+DateApproved: 3/1/2017
 MetaDescription:  Learn about Visual Studio Code IntelliSense (intelligent code completion). 
 ---
 
@@ -91,10 +91,13 @@ The settings shown below are the default settings. You can change these settings
 
     // Enable word based suggestions
     "editor.wordBasedSuggestions": true
+    
+    // Enable parameter hints
+    "editor.parameterHints": true
 }
 ```
 
-By default, VS Code shows snippets and completion proposals in one widget. You can control the behavior with the `editor.snippetSuggestions` setting. To remove snippets from the suggestions widget, set the value to `"none"`. If you'd like to see snippets, you can specify the order relative to suggestions; at the top (`"top"`), at the bottom (`"bottom`"), or inline ordered alphabetically (`"inline"`). The default is `"inline"`.
+By default, VS Code shows snippets and completion proposals in one widget. You can control the behavior with the `editor.snippetSuggestions` setting. To remove snippets from the suggestions widget, set the value to `"none"`. If you'd like to see snippets, you can specify the order relative to suggestions; at the top (`"top"`), at the bottom (`"bottom`"), or inline ordered alphabetically (`"inline"`). The default is `"bottom"`.
 
 ### Key Bindings
 

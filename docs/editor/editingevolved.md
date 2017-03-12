@@ -4,7 +4,7 @@ Area: editor
 TOCTitle: Editing Evolved
 ContentId: 8966BBFD-C66D-4283-9DCA-8CAC0179886E
 PageTitle: Editing Evolved
-DateApproved: 2/2/2017
+DateApproved: 3/1/2017
 MetaDescription: Visual Studio Code is a first class editor - but it's also so much more with features such as IntelliSense and smart code navigation.
 ---
 
@@ -51,6 +51,14 @@ If you press `kbstyle(Ctrl)` and hover over a symbol, a preview of the declarati
 ![Ctrl Hover](images/editingevolved/ctrlhover.png)
 
 > **Tip:** You can jump to the definition with `kbstyle(Ctrl+Click)` or open the definition to the side with `kbstyle(Ctrl+Alt+Click)`. 
+
+## Go to Type Definition
+
+Some [languages](/docs/languages/overview.md) also support jumping to the type definition of a symbol by pressing `kb(editor.action.goToTypeDefinition)`. This will take you to the definition of the type of a symbol.
+
+## Go to Implementation
+
+[Languages](/docs/languages/overview.md) can also support jumping to the implementation of a symbol by pressing `kb(editor.action.goToImplementation)`. For an interface, this shows all the implementers of that interface and for abstract methods, this shows all concrete implementations of that method.
 
 ## Go to Symbol
 

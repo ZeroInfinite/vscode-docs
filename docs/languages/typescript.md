@@ -4,7 +4,7 @@ Area: languages
 TOCTitle: TypeScript
 ContentId: 05C114DF-4FDC-4C65-8954-58F5F293FAFD
 PageTitle: TypeScript Programming with Visual Studio Code
-DateApproved: 2/2/2017
+DateApproved: 3/1/2017
 MetaDescription: Get the best out editing TypeScript with Visual Studio Code.
 MetaSocialImage: typescript_Languages_typescript.png
 ---
@@ -201,9 +201,9 @@ If your workspace has a specific TypeScript version, you can switch between the 
 
 After switching versions of TypeScript or changing `typescript.tsdk`, restart VS Code to have the change take effect. You can switch back to the version of TypeScript that comes with VS Code by clicking on the TypeScript version in the status bar again.
 
-## References Code Lens
+## References CodeLens
 
-The TypeScript references code lens displays an inline count of reference for classes, interfaces, methods, properties, and exported objects:
+The TypeScript references CodeLens displays an inline count of reference for classes, interfaces, methods, properties, and exported objects:
 
 ![TypeScript references code lens](images/typescript/ts-references-code-lens.png)
 

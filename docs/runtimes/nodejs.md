@@ -4,7 +4,7 @@ Area: runtimes
 TOCTitle: Node.js
 ContentId: ED394CD2-D09E-4E3A-96AD-6D3D8337BA9D
 PageTitle: Node.js and Visual Studio Code Tutorial
-DateApproved: 2/2/2017
+DateApproved: 3/1/2017
 MetaDescription: Visual Studio Code has great support for writing and debugging Node.js applications. This tutorial takes you from Hello World to a full Express web application.
 MetaSocialImage: nodejs_runtimes_node.png
 ---
@@ -158,7 +158,7 @@ Open the file `app.js` and hover over the Node.js global object `__dirname`. Not
 
 ![http IntelliSense](images/nodejs/intellisense.png)
 
-VS Code uses TypeScript definition files (for example `node.d.ts`) to provide metadata to VS Code about the JavaScript based frameworks you are consuming in your application. Because TypeScript definition files are written in TypeScript, they can express the data types of parameters and functions, allowing VS Code to provide a rich IntelliSense experience. Thanks to a feature called `Automatic Typing Acquisition` you as user do not have to worry about these typings file, VS Code will install them automatically for you.
+VS Code uses TypeScript Type Declaration (typings) files (for example `node.d.ts`) to provide metadata to VS Code about the JavaScript based frameworks you are consuming in your application. Type Declaration files are written in TypeScript so they can express the data types of parameters and functions, allowing VS Code to provide a rich IntelliSense experience. Thanks to a feature called `Automatic Typing Acquisition`, you do not have to worry about downloading these Type Declaration files, VS Code will install them automatically for you.
 
 You can also write code that references modules in other files. For example, in `app.js` we require the `./routes/index` module, which exports an `Express.Router` class. If you bring up IntelliSense on `routes`, you can see the shape of the `Router` class.
 
@@ -193,6 +193,79 @@ Save the new file and make sure **Launch Program** is selected in the configurat
 
 ![Debug session](images/nodejs/debugsession.png)
 
+## Deploying your Application to the Cloud
+
+Let's finish up this walkthrough by deploying our application to the cloud. While it is possible to deploy directly to a web site, it is not a best practice. Instead, we will set up continuous deployment from a GitHub repository to an Azure App Service website (Azure's Platform as a Service offering). With this setup, you can use version control to roll back changes, configure different branches to deploy to different development "slots" (e.g. development or production) and more.
+
+If this sounds complicated, don't worry, it isn't :).
+
+> If you don't have an Azure subscription, [sign up today](https://azure.microsoft.com/en-us/free/) for a free 30 day account with $200 in Azure Credits to try out any combination of Azure services.
+
+The first thing we'll need to do is get our source code into a GitHub repository. Browse to your GitHub account and [create a new public repository](https://github.com/new).
+
+![Create a new GitHub repository](images/nodejs/newgithubrepo.png)
+
+---
+
+We are going to follow the instructions provided by GitHub to create a new repository on the command line, but with a few changes. 
+It is a good practice to include a `.gitignore` file in your repository that excludes the `node_modules` folder. We'll do this instead of creating a `README.md` file and we'll add and commit all of the files in the workspace (except `node_modules` of course): 
+
+```
+echo "node_modules" >> .gitignore
+git init
+git add .
+git commit -m "first commit"
+git remote add origin https://github.com/**YourGitHubAccount**/myExpressApp.git
+git push -u origin master
+```
+
+Next, we will create an Azure Website to host our app. Once we have that, we'll configure the site to pull and deploy from the Git repository every time we push changes. To create the site, we'll use the new, cross platform Azure CLI.
+
+> [Install the Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
+
+The following CLI commands will create our site and set up continuous deployment. Make sure you name your site properly per the comments.
+
+```
+# Follow the login instructions
+az login
+
+# Create an Azure Resource Group which is essentially a container for all of your application resources.
+az group create -l westus -n myExpressAppGroup
+
+# Create an Azure App Service Plan which is essentially the machine on which your application will be hosted.
+# In this walkthrough, we will use a FREE plan which will host your app on a machine with other websites.
+az appservice plan create -n myExpressAppPlan -g myExpressAppGroup -l westus --sku FREE
+
+# Now create the website and give it a unique name as it will be referenced as http://**myUniqueName-ExpressApp**.azurewebsites.net
+az appservice web create -n myUniqueName-ExpressApp -g myExpressAppGroup -p myExpressAppPlan
+
+# Let's test that our site is up and running. It will be a temporary site as we have not deployed any code here yet.
+az appservice web browse -n myUniqueName-ExpressApp -g myExpressAppGroup
+
+# Configure the site for continuous deployment through our GitHub repository.
+az appservice web source-control config --repo-url https://github.com/yourgithubaccount/myExpressApp -n myUniqueName-ExpressApp -g myExpressAppGroup
+```
+
+Refresh the site and you should see your Express application hosted in the cloud on Azure! 
+
+![Express app running in Azure](images/nodejs/expressinazure.png)
+
+---
+
+To test continuous deployment, make a change to the `index.jade` file found in the `views` folder and make a local commit.
+
+![Commit a change](images/nodejs/commitchange.png)
+
+Use the overflow menu to **Sync** the change with the GitHub repository. 
+
+![Sync the change](images/nodejs/syncchange.png)
+
+Finally, the site will recognize a change has been pushed and the content will automatically be redeployed. 
+
+![VS Code Rocks](images/nodejs/vscoderocks.png)
+
+---
+
 ## Node.js Extensions
 
 The community is continually developing more and more valuable extensions for Node.js. Here are some of the extensions we have found most useful. 
@@ -217,17 +290,3 @@ There is much more to explore with Visual Studio Code, please try the following 
 * [Debugging](/docs/editor/debugging.md) - This is where VS Code really shines
 * [Editing Evolved](/docs/editor/editingevolved.md) - Lint, IntelliSense, Lightbulbs, Peek and Go to Definition and more
 * [Tasks](/docs/editor/tasks.md) - Running tasks with Gulp, Grunt and Jake.  Showing Errors and Warnings
-
-## Common Questions
-
-**Q: Do I need to define a `jsconfig.json` file?**
-
-**A:** Without a `jsconfig.json` file in the workspace root folder, VS Code treats all files and folders as belonging to the same project context. This is sufficient for common setups. There are situations when you want to add a `jsconfig.json` file.
-
-For example:
-
-- When not all JavaScript files should be part of the project context, for example, you want to exclude some files, then you can define which files to exclude in the `jsconfig.json` file.
-- When a workspace contains more than one project context, then you should add a `jsconfig.json` file at the root folder for each project.
-- When you are using the TypeScript compiler to down-level compile JavaScript source code.
-
-More information about the configuration options for a `jsconfig.json` can be found in [jsconfig.json reference](/docs/languages/javascript.md#javascript-project-jsconfigjson).

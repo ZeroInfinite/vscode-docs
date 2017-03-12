@@ -4,7 +4,7 @@ Area: editor
 TOCTitle: Node.js Debugging
 ContentId: 3AC4DBB5-1469-47FD-9CC2-6C94684D4A9D
 PageTitle: Node.js Debugging in Visual Studio Code
-DateApproved: 2/2/2017
+DateApproved: 3/1/2017
 MetaDescription: Visual Studio Code includes Node.js debugging support.  Set breakpoints, step-in, inspect variables and more.
 MetaSocialImage: debugging_Debugging.png
 ---
@@ -14,28 +14,45 @@ Visual Studio Code has built-in debugging support for the [Node.js](https://node
 
 This document explains the details of Node.js debugging. The general debugging feature are described in [Debugging](/docs/editor/debugging.md).
 
-## Experimental Node.js debugger (node2)
+## Supported Node-like Runtimes
 
-VS Code includes an experimental Node.js debug extension with debug type `node2` that uses the [V8 Inspector Protocol](https://chromedevtools.github.io/debugger-protocol-viewer/v8/), which Node.js now exposes via the `--inspect` flag, only in Node.js versions 6.3+. This is the same protocol exposed by [Chrome and other targets](https://developer.chrome.com/devtools/docs/debugger-protocol). This extension runs on the [vscode-chrome-debug-core](https://github.com/Microsoft/vscode-chrome-debug-core) library which also powers the [Debugger for Chrome](https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-chrome) extension, and several others.
+Since the VS Code Node.js debugger communicates to the Node.js runtimes through _wire protocols_, the set of supported runtimes is determined by all runtimes supporting the wire protocols.
 
-We recommend using the new experimental debugger `node2` for node.js versions >= 6.3. When debugging Node.js versions < 6.3, you have to use the 'old' debugger `node`.
+Today two wire protocols exist:
+- **legacy**: the original [V8 Debugger Protocol](https://github.com/buggerjs/bugger-v8-client/blob/master/PROTOCOL.md) which is currently supported by all runtimes but will most likely be dropped in Node.js v8.x.
+- **inpector**: the new [V8 Inspector Protocol](https://chromedevtools.github.io/debugger-protocol-viewer/v8/) is exposed via the `--inspect` flag in Node.js versions >= 6.3. It addresses most of the limitations and scalability issues of the legacy protocol.
 
->**Note**: On the Windows operating sytem, we recommend Node.js v6.9+ with `node2` because earlier versions are not stable enough.
+Currently these protocols are supported by specific version ranges of the following runtimes:
 
-Here are a few additional reasons for using the `node2` debugger over `node`:
+Runtime   | 'Legacy Protocol' | 'Inspector Protocol'
+----------|-------------------|----------
+io.js     | all               | no
+node.js   | < 8.x             | >= 6.3 (Windows: >= 6.9)
+Electron  | all               | not yet
+Chakra    | all               | not yet
 
-* It can be more stable when debugging very large JavaScript objects. The older debug protocol can become painfully slow when sending large values between the client and server.
-* If you are using an ES6 Proxy in your app, a Node v7+ runtime might crash when being debugged by the old debugger. This does not happen with `node2`. This issue is tracked in [Microsoft/vscode#12749](https://github.com/Microsoft/vscode/issues/12749).
-* `node2` can handle some trickier source map setups. If you have trouble setting breakpoints in source mapped files, try using `node2`.
+Although it appears to be possible that the VS Code Node.js debugger picks the best protocol always automatically,
+we've decided for a 'pessimistic approach' with an explicit launch configuration attribute `protocol` and the following values:
 
->**Note**: See more tips in the `node2` extension [README](https://marketplace.visualstudio.com/items?itemName=ms-vscode.node-debug2).
+- **`auto`**: tries to automatically detect the protocol used by the targeted runtime. For configurations of request type `launch` and if no `runtimeExecutable` is specified, we try to determine the version by running node from the PATH with an `--version` argument. If the version is >= 6.9 the new 'inspector' protocol is used. For configurations of request type 'attach' we try to connect with the new protocol and if this works, we use the 'inspector' protocol. We only switch to the new inspector protocol for versions >= 6.9 because of severe problems in earlier versions.
+- **`inspector`**: forces the node debugger to use the 'inspector' protocol based implementation. This is supported by node versions >= 6.3, but not (yet) by Electron.
+- **`legacy`**: forces the node debugger to use the 'legacy' protocol based implementation. This is supported by node versions < v8.0) and Electron.
 
-We try to keep feature parity between both node debuggers but this becomes more and more difficult because the technology underlying `node` (V8 Debugger Protocol) is deprecated (frozen) whereas the new technology (Chrome Debugger Protocol) evolves quickly. For this reason, we specify the supported debugger type if a features is not supported by both `node` and `node2`.
+Currently the default value for the `protocol` attribute is `legacy`. We are planning to change this to `auto` in the future as soon as the `auto` switching smartness has matured.
+
+If your runtime supports both protocols, here are a few additional reasons for using the `inspector` protocol over `legacy`:
+
+* It can be more stable when debugging very large JavaScript objects. The legacy protocol can become painfully slow when sending large values between the client and server.
+* If you are using an ES6 Proxy in your app, you can prevent a Node v7+ runtime from crashing when being debugged via the `inspector` protocol. This issue is tracked in [Microsoft/vscode#12749](https://github.com/Microsoft/vscode/issues/12749).
+* Debugging via the `inspector` protocol can handle some trickier source map setups. If you have trouble setting breakpoints in source mapped files, try using `inspector`.
+
+We try to keep feature parity between both protocol implementations but this becomes more and more difficult because the technology underlying `legacy` is deprecated whereas the new `inspector` evolves quickly. For this reason, we specify the supported protocols  if a features is not supported by both `legacy` and `inspector`.
 
 ## Launch configuration attributes
 
 The following attributes are supported in launch configurations of type `launch` and `attach`:
 
+* `protocol` - debug protocol to use. See section 'Supported Node-like Runtimes' above.
 * `port` - debug port to use. See sections 'Attaching to Node.js' and 'Remote Debugging Node.js'.
 * `address` - TCP/IP address of the debug port. See sections 'Attaching to Node.js' and 'Remote Debugging Node.js'.
 * `restart` - restart session on termination. See section 'Restarting debug sessions automatically'.
@@ -297,7 +314,7 @@ This breakpoint validation occurs when a session starts and the breakpoints are 
 
 ![Breakpoint Actions](images/debugging/breakpointstoolbar.png)
 
-## Skipping uninteresting code (node, node2, chrome)
+## Skipping uninteresting code (node, chrome)
 
 VS Code Node.js debugging has a feature to avoid code that you don't want to step through (AKA 'Just my Code'). This feature can be enabled with the `skipFiles` attribute in your launch configuration. `skipFiles` is an array of glob patterns for script paths to skip.
 
@@ -305,12 +322,12 @@ For example using:
 
 ```typescript
   "skipFiles": [
-    "node_modules/**/*.js",
-    "lib/**/*.js"
+    "${workspaceRoot}/node_modules/**/*.js",
+    "${workspaceRoot}/lib/**/*.js"
   ]
 ```
 
-all code in the `node_modules` and `lib` folders will be skipped.
+all code in the `node_modules` and `lib` folders in your project will be skipped.
 
 Built-in **core modules** of Node.js can be referred to by the 'magic name' `<node_internals>` in a glob pattern. The following example skips all internal modules but `events.js`:
 
@@ -333,20 +350,20 @@ Skipped source is shown in a 'dimmed' style in the CALL STACK view:
 
 Hovering over the dimmed entries explains why the stack frame is dimmed.
 
-A context menu item on the call stack, **Toggle skipping this file** enables you to easily skip a file at runtime without adding it to your launch config (`node2` only). This option only persists for the current debugging session. You can also use it to stop skipping a file that is skipped by the `skipFiles` option in your launch config.
+A context menu item on the call stack, **Toggle skipping this file** enables you to easily skip a file at runtime without adding it to your launch config ('inspector' protocol only). This option only persists for the current debugging session. You can also use it to stop skipping a file that is skipped by the `skipFiles` option in your launch config.
 
->**Note:** The debugger `node` supports negative glob patterns, but they must **follow** a positive pattern: positive patterns add to the set of skipped files, while negative patterns subtract from that set.
+>**Note:** The `legacy` protocol debugger supports negative glob patterns, but they must **follow** a positive pattern: positive patterns add to the set of skipped files, while negative patterns subtract from that set.
 
-In the following (`node`-only) example all but a 'math' module is skipped:
+In the following (`legacy` protocol-only) example all but a 'math' module is skipped:
 
 ```typescript
 "skipFiles": [
-    "node_modules/**/*.js",
-    "!node_modules/math/**/*.js"
+    "${workspaceRoot}/node_modules/**/*.js",
+    "!${workspaceRoot}/node_modules/math/**/*.js"
 ]
 ```
 
->**Note:** The debugger `node` has to emulate the `skipFiles` feature because the _V8 Debugger Protocol_ does not support it natively. This might result in slow stepping performance.
+>**Note:** The `legacy` protocol debugger has to emulate the `skipFiles` feature because the _V8 Debugger Protocol_ does not support it natively. This might result in slow stepping performance.
 
 ## Source maps
 
@@ -382,7 +399,7 @@ This is the corresponding launch configuration for a TypeScript program:
             "type": "node",
             "request": "launch",
             "program": "app.ts",
-            "outFiles": [ "bin/**/*.js" ]
+            "outFiles": [ "${workspaceRoot}/bin/**/*.js" ]
         }
     ]
 }
@@ -406,12 +423,12 @@ Finally, the debug adapter searches for the full path of `app.ts` in this result
 
 Here are some things to try when your breakpoints turn gray:
 
-* Do you have `"sourceMaps": true` in your `launch.json`?
+* Do you have `"sourceMaps": false` in your `launch.json`?
 * Did you build with source maps enabled? Are there `.js.map` files, or inlined source maps in your `.js` files?
 * Did you set the `outFiles` property in your `launch.json`? It should be a glob pattern for an absolute path that matches your `.js` files.
-* Try the new experimental [node2](/docs/editor/node-debugging.md#experimental-nodejs-debugger-node2) debug adapter. It can handle some more of the more complex source map cases.
+* Try the new [Inspector Protocol](/docs/editor/node-debugging.md#debugging-with-inspector-protocol) implementation. It can handle some more of the more complex source map cases.
 * Are the `sourceRoot` and `sources` properties in your source map correct? Can they be combined to get the correct path to the `.ts` file?
-* Are you using Webpack? By default, it outputs paths with a `webpack:///` prefix, which the debug adapter can't resolve. You can change this in your Webpack configuration with the `devtoolModuleFilenameTemplate` option, or try using `node2`, which provides some extra options for resolving these paths.
+* Are you using Webpack? By default, it outputs paths with a `webpack:///` prefix, which the debug adapter can't resolve. You can change this in your Webpack configuration with the `devtoolModuleFilenameTemplate` option, or try using the 'inspector' protocol, which provides some extra options for resolving these paths.
 * Have you opened the folder in VS Code with the incorrect case? It's possible to open folder `foo/` from the command line like `code FOO` in which case source maps may not be resolved correctly.
 * Try searching for help with your particular setup on Stack Overflow or by filing an issue on GitHub.
 * Try adding a `debugger` statement. If it breaks into the `.ts` file there, but breakpoints at that spot don't bind, that is useful information to include with a GitHub issue.

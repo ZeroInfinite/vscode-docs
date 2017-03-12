@@ -4,7 +4,7 @@ Area: editor
 TOCTitle: Version Control
 ContentId: 7E22CCC0-2AB8-4729-A4C9-BE2B16853820
 PageTitle: Version Control
-DateApproved: 2/2/2017
+DateApproved: 3/1/2017
 MetaDescription: Visual Studio Code has integrated Git support for the most common commands.
 ---
 
@@ -98,15 +98,15 @@ To open the Git output window, run **View** > **Toggle Output** and select `Git`
 
 ## Initialize a Repository
 
-If your workspace isn't under Git source control, you can easily create a Git repository with the **Initialise git repository** command.  When VS Code doesn't detect an existing Git repository, you will see a **This workspace isn't yet under git source control.** message in the Git View and the **Initialize git repository** command will be available.
+If your workspace isn't under Git source control, you can easily create a Git repository with the **Initialize Git Repository** command.  When VS Code doesn't detect an existing Git repository, you will see a **This workspace isn't yet under git source control.** message in the Git View and the **Initialize Git Repository** command will be available.
 
 ![Git initialize repository](images/versioncontrol/git-initialize.png)
 
-Running **Initialize git repository** will create the necessary Git repository metadata files and show your workspace files as unstaged changes.
+Running **Initialize Git Repository** will create the necessary Git repository metadata files and show your workspace files as unstaged changes.
 
 ## Git patch/diff mode
 
-When you run VS Code from the command line, you can pass the `--wait` argument to make the command wait until you have closed the current VS Code instance. This can be used to configure VS Code as your Git external editor.
+When you launch VS Code from the command line, you can pass the `--wait` argument to make the launch command wait until you have closed the new VS Code instance. This can be useful when you configure VS Code as your Git external editor.
 
 Here are the steps to do so:
 
